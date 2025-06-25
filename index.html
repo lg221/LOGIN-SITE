@@ -277,33 +277,292 @@
             </div>
         </div>
         
-        <div class="signup-link">
-            Don't have an account? <a href="#">Sign up</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISHWA AI - Your AI Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .chat-container {
+            height: calc(100vh - 200px);
+        }
+        .message-animation {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .typing-indicator {
+            display: inline-block;
+        }
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background: #9CA3AF;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: bounce 1.5s infinite ease-in-out;
+        }
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+        .language-btn {
+            transition: all 0.3s ease;
+        }
+        .language-btn.active {
+            background-color: #3B82F6;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto max-w-4xl p-4">
+        <!-- Header -->
+        <header class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
+                        <i class="fas fa-robot text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">VISHWA AI</h1>
+                        <p class="text-gray-600">Your AI Assistant for Artificial Intelligence</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button id="english-btn" class="language-btn active px-4 py-2 rounded-full bg-blue-500 text-white">
+                        English
+                    </button>
+                    <button id="sinhala-btn" class="language-btn px-4 py-2 rounded-full bg-gray-200 text-gray-700">
+                        සිංහල
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Chat Container -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <!-- Chat Messages -->
+            <div id="chat-messages" class="chat-container p-4 overflow-y-auto">
+                <!-- Welcome Message -->
+                <div class="message-animation mb-4">
+                    <div class="flex items-start">
+                        <div class="bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mr-3">
+                            <i class="fas fa-robot text-blue-500"></i>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg p-3 max-w-[80%]">
+                            <p id="welcome-message" class="text-gray-800">Hello! I'm VISHWA AI, your artificial intelligence assistant. How can I help you with AI today?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="border-t border-gray-200 p-4 bg-gray-50">
+                <div class="flex space-x-2">
+                    <input id="user-input" type="text" placeholder="Ask me anything about AI..." 
+                           class="flex-1 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="send-btn" class="bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center hover:bg-blue-600 transition">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-gray-500 mt-2 text-center">VISHWA AI may produce inaccurate information about people, places, or facts.</p>
+            </div>
         </div>
     </div>
 
     <script>
-        // Form submission handling
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            // Here you would typically send this data to your server
-            console.log('Login attempt with:', { email, password });
-            
-            // Simulate successful login
-            alert(`Welcome to VISHWA OFC SITE! Login successful for ${email}`);
+        // Language state
+        let currentLanguage = 'english';
+        const welcomeMessages = {
+            english: "Hello! I'm VISHWA AI, your artificial intelligence assistant. How can I help you with AI today?",
+            sinhala: "ආයුබෝවන්! මම VISHWA AI, ඔබේ කෘතිම බුද්ධිය සහායකයා. අද AI පිළිබඳව මට ඔබට උදව් කළ හැක්කේ කෙසේද?"
+        };
+
+        // AI responses in both languages
+        const aiResponses = {
+            english: {
+                "what is ai": "Artificial Intelligence (AI) refers to the simulation of human intelligence in machines programmed to think like humans and mimic their actions. AI can perform tasks such as learning, problem-solving, reasoning, and perception.",
+                "machine learning": "Machine learning is a subset of AI that enables systems to automatically learn and improve from experience without being explicitly programmed. It focuses on developing algorithms that can access data and use it to learn for themselves.",
+                "deep learning": "Deep learning is a specialized form of machine learning that uses neural networks with many layers (deep neural networks) to analyze various factors of data. It's particularly effective for tasks like image and speech recognition.",
+                "ai in sri lanka": "In Sri Lanka, AI adoption is growing across sectors like healthcare, finance, and agriculture. Universities offer AI courses, and startups are developing AI solutions for local challenges like crop disease detection and traffic management.",
+                "future of ai": "The future of AI includes more personalized experiences, advanced automation, and breakthroughs in fields like healthcare and climate science. Ethical AI development will be crucial to ensure benefits for all humanity."
+            },
+            sinhala: {
+                "what is ai": "කෘතිම බුද්ධිය (AI) යනු මිනිස් බුද්ධිය යාන්ත්‍රණවල අනුකරණය කිරීමයි. මිනිසුන් මෙන් සිතීමට සහ ක්‍රියා කිරීමට මෙම යන්ත්‍ර ක්‍රමලේඛනය කර ඇත. AI ඉගෙනීම, ගැටළු විසඳීම, තර්ක කිරීම සහ ප්‍රත්‍යක්ෂය වැනි කාර්යයන් සිදු කළ හැකිය.",
+                "machine learning": "මැෂින් ඉගෙනීම යනු AI හි උප කොටසක් වන අතර එය පද්ධතිවලට පැහැදිලිව ක්‍රමලේඛනය කිරීමකින් තොරව අත්දැකීම් වලින් ස්වයංක්‍රීයව ඉගෙනීමට සහ වැඩිදියුණු කිරීමට ඉඩ සලසයි. දත්ත වෙත ප්‍රවේශ වීමට සහ එය භාවිතා කරමින් ඔවුන් විසින්ම ඉගෙනීමට හැකි ඇල්ගොරිතම සංවර්ධනය කිරීම මත එය අවධානය යොමු කරයි.",
+                "deep learning": "ගැඹුරු ඉගෙනීම යනු දත්තයේ විවිධ සාධක විශ්ලේණය කිරීම සඳහා බහු ස්ථර (ගැඹුරු ස්නායු ජාල) සහිත ස්නායු ජාල භාවිතා කරන යන්ත්‍ර ඉගෙනීමේ විශේෂිත ආකාරයකි. රූප හා කථන හඳුනාගැනීම වැනි කාර්යයන් සඳහා එය විශේෂයෙන් ඵලදායී වේ.",
+                "ai in sri lanka": "ශ්‍රී ලංකාවේ, සෞඛ්‍ය සේවය, මූල්‍ය සහ කෘෂිකර්මාන්තය වැනි ක්ෂේත්‍රවල AI භාවිතය වර්ධනය වෙමින් පවතී. විශ්වවිද්‍යාල AI පාඨමාලා පිරිනමන අතර, ආරම්භක සමාගම් ගොවිතැනේ රෝග හඳුනාගැනීම සහ ගමන් ගතිකත්වය කළමනාකරණය වැනි දේශීය අභියෝග සඳහා AI විසඳුම් සංවර්ධනය කරයි.",
+                "future of ai": "AI හි අනාගතයට වැඩි පුද්ගලීකරණය වූ අත්දැකීම්, දියුණු ස්වයංක්‍රීයකරණය සහ සෞඛ්‍ය සේවය හා දේශගුණික විද්‍යාව වැනි ක්ෂේත්‍රවල සාර්ථකත්වයන් ඇතුළත් වේ. සියලු මානව ජාතියට ප්‍රතිලාභ තහවුරු කිරීම සඳහා සදාචාරාත්මක AI සංවර්ධනය තීරණාත්මක වනු ඇත."
+            }
+        };
+
+        // DOM elements
+        const englishBtn = document.getElementById('english-btn');
+        const sinhalaBtn = document.getElementById('sinhala-btn');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        // Language switching
+        englishBtn.addEventListener('click', () => {
+            if (currentLanguage !== 'english') {
+                currentLanguage = 'english';
+                englishBtn.classList.add('active');
+                sinhalaBtn.classList.remove('active');
+                welcomeMessage.textContent = welcomeMessages.english;
+                updatePlaceholder();
+            }
         });
 
-        // Add subtle animation to the login container on load
-        document.querySelector('.login-container').style.opacity = '0';
-        document.querySelector('.login-container').style.transform = 'translateY(20px)';
-        
-        setTimeout(() => {
-            document.querySelector('.login-container').style.opacity = '1';
-            document.querySelector('.login-container').style.transform = 'translateY(0)';
-        }, 100);
+        sinhalaBtn.addEventListener('click', () => {
+            if (currentLanguage !== 'sinhala') {
+                currentLanguage = 'sinhala';
+                sinhalaBtn.classList.add('active');
+                englishBtn.classList.remove('active');
+                welcomeMessage.textContent = welcomeMessages.sinhala;
+                updatePlaceholder();
+            }
+        });
+
+        // Update input placeholder based on language
+        function updatePlaceholder() {
+            userInput.placeholder = currentLanguage === 'english' 
+                ? 'Ask me anything about AI...' 
+                : 'AI පිළිබඳව මට ඕනෑම දෙයක් අසන්න...';
+        }
+
+        // Send message function
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message === '') return;
+
+            // Add user message to chat
+            addMessage(message, 'user');
+
+            // Clear input
+            userInput.value = '';
+
+            // Show typing indicator
+            const typingId = showTypingIndicator();
+
+            // Simulate AI thinking
+            setTimeout(() => {
+                // Remove typing indicator
+                removeTypingIndicator(typingId);
+
+                // Get AI response
+                const response = getAIResponse(message);
+                
+                // Add AI response to chat
+                addMessage(response, 'ai');
+            }, 1000 + Math.random() * 2000); // Random delay between 1-3 seconds
+        }
+
+        // Add message to chat
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message-animation', 'mb-4');
+
+            if (sender === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="flex items-start justify-end">
+                        <div class="bg-gray-100 rounded-lg p-3 max-w-[80%]">
+                            <p class="text-gray-800">${text}</p>
+                        </div>
+                        <div class="bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center ml-3">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="flex items-start">
+                        <div class="bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mr-3">
+                            <i class="fas fa-robot text-blue-500"></i>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg p-3 max-w-[80%]">
+                            <p class="text-gray-800">${text}</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Show typing indicator
+        function showTypingIndicator() {
+            const typingId = 'typing-' + Date.now();
+            const typingDiv = document.createElement('div');
+            typingDiv.id = typingId;
+            typingDiv.classList.add('message-animation', 'mb-4');
+            typingDiv.innerHTML = `
+                <div class="flex items-start">
+                    <div class="bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mr-3">
+                        <i class="fas fa-robot text-blue-500"></i>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg p-3 max-w-[80%]">
+                        <div class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return typingId;
+        }
+
+        // Remove typing indicator
+        function removeTypingIndicator(id) {
+            const typingElement = document.getElementById(id);
+            if (typingElement) {
+                typingElement.remove();
+            }
+        }
+
+        // Get AI response based on input
+        function getAIResponse(input) {
+            const lowerInput = input.toLowerCase();
+            const responses = aiResponses[currentLanguage];
+            
+            // Check for specific questions
+            for (const key in responses) {
+                if (lowerInput.includes(key)) {
+                    return responses[key];
+                }
+            }
+            
+            // Default response
+            return currentLanguage === 'english' 
+                ? "I'm sorry, I don't have information about that specific AI topic. Could you ask me something else about artificial intelligence?"
+                : "මට කණගාටුයි, මට එම නිශ්චිත AI මාතෘකාව පිළිබඳ තොරතුරු නොමැත. කෘතිම බුද්ධිය පිළිබඳව වෙනත් දෙයක් ඇසිය හැකිද?";
+        }
+
+        // Event listeners
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
     </script>
 </body>
 </html>
